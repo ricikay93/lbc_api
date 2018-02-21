@@ -1,0 +1,15 @@
+{
+
+    "development": {
+        "dialect": "sqlite",
+        "storage": "church-dev.sqlite"
+    },
+    "test": {
+        "dialect": "sqlite",
+        "storage": "church-test.sqlite"
+    },
+    "production": {
+        "dialect": "sqlite",
+        "storage": "church.sqlite"
+    }
+}
