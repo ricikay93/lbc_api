@@ -147,30 +147,35 @@ var get_a_circuit = function(req, res) {
 };
 
 var add_circuit = function(req, res) {
-    var newCircuit = new Circuit(req.body);
 
-    newCircuit.save().then((result) => {
-        res.status(201).json({
-            'message': 'Success'
+    if (!req.body) { res.status(500).send('Internal Server Error'); } else {
+        var newCircuit = new Circuit(req.body);
+
+        newCircuit.save().then((result) => {
+            res.status(201).json({
+                'message': 'Success'
+            });
+        }).catch(function(error) {
+            res.status(500).send('Internal Server Error');
         });
-    }).catch(function(error) {
-        res.status(500).send('Internal Server Error');
-    });
+    }
+
 };
 
 var edit_circuit = function(req, res) {
-    console.log(req.body);
-    Circuit.update(req.body, {
-        where: {
-            id: req.params.id
-        }
-    }).then((result) => {
-        res.status(201).json({
-            'message': 'Success'
+    if (!req.body) { res.status(500).send('Internal Server Error'); } else {
+        Circuit.update(req.body, {
+            where: {
+                id: req.params.id
+            }
+        }).then((result) => {
+            res.status(201).json({
+                'message': 'Success'
+            });
+        }).catch(function(error) {
+            res.status(500).send('Internal Server Error');
         });
-    }).catch(function(error) {
-        res.status(500).send('Internal Server Error');
-    });
+    }
 };
 
 var delete_circuit = function(req, res) {
