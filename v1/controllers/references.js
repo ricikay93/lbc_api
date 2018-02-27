@@ -5,6 +5,7 @@ let references = require('../models/references');
 
 let Parish = references.Parish;
 let ContactType = references.ContactType;
+let Skill = references.Skill;
 
 /**
  * Get all parishes
@@ -57,32 +58,80 @@ var get_all_contacts = function(req, res) {
  * @param {*} req 
  * @param {*} res 
  */
-var get_contact_type = function(req, res) {};
+var get_contact_type = function(req, res) {
+    ContactType.findById(req.params.id).then(function(result) {
+        res.json(result);
+    }, function(err) {
+        res.json({ message: 'Error loading parishes: ' + err })
+    });
+};
 
 /**
  * get contacts by church criteria
  * @param {*} req 
  * @param {*} res 
  */
-var get_church_contacts = function(req, res) {};
+var get_church_contacts = function(req, res) {
+    ContactType.findAll({
+        where: {
+            contactFilter: 'churchOnly'
+        }
+    }).then(function(result) {
+        res.json(result);
+    }, function(err) {
+        res.json({ message: 'Error loading parishes: ' + err })
+    });
+};
 
 /**
  * get contacts by people criteria
  * @param {*} req 
  * @param {*} res 
  */
-var get_people_contacts = function(req, res) {};
+var get_people_contacts = function(req, res) {
+    ContactType.findAll({
+        where: {
+            contactFilter: 'peopleOnly'
+        }
+    }).then(function(result) {
+        res.json(result);
+    }, function(err) {
+        res.json({ message: 'Error loading parishes: ' + err })
+    });
+};
 
 
-var get_skills = function(req, res) {};
+var get_skills = function(req, res) {
+    Skill.findAll().then(function(result) {
+        res.json(result);
+    }, function(err) {
+        res.json({ message: 'Error loading parishes: ' + err })
+    });
+};
 
-var get_skill = function(req, res) {};
+var get_skill = function(req, res) {
+    Skill.findById(req.params.id).then(function(result) {
+        res.json(result);
+    }, function(err) {
+        res.json({ message: 'Error loading parishes: ' + err })
+    });
+};
 
 var edit_skill = function(req, res) {};
 
 var add_skill = function(req, res) {};
 
-var delete_skill = function(req, res) {};
+var delete_skill = function(req, res) {
+    Skill.destroy({
+        where: {
+            id: req.params.id
+        }
+    }).then(function(result) {
+        res.json({ 'message': 'Success!' });
+    }, function(err) {
+        res.json({ message: 'Error loading parishes: ' + err })
+    });
+};
 
 /**
  * exports
