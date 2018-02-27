@@ -7,13 +7,26 @@ let Parish = referenceModels.Parish;
 
 
 var Circuit = sequelize.define('circuit', {
-    circuit: { type: Sequelize.STRING, unique: true }
+    circuit: {
+        type: Sequelize.STRING,
+        unique: true
+    },
+    churchCount: {
+        type: Sequelize.VIRTUAL(Sequelize.INTEGER, [
+            [sequelize.literal('(SELECT COUNT(churches.id) FROM churches WHERE churches.circuitID = Circuit.id)'), 'churchCount']
+        ])
+    }
 });
 
-Circuit.belongsTo(Parish);
-Parish.hasMany(Circuit, { foreignKey: 'parishCode' });
+Circuit.belongsTo(Parish, {
+    foreignKey: 'assocParish'
+});
+Parish.hasMany(Circuit, {
+    foreignKey: 'assocParish',
+    as: 'Circuits'
+});
 
-var Church = sequelize.define('circuitChurch', {
+var Church = sequelize.define('church', {
     church: {
         type: Sequelize.STRING,
         unique: true
@@ -33,8 +46,14 @@ var Church = sequelize.define('circuitChurch', {
     }
 });
 
-Church.belongsTo(Circuit);
-Circuit.hasMany(Church, { foreignKey: 'parish', as: 'parishes', onDelete: 'CASCADE' });
+Church.belongsTo(Circuit, {
+    foreignKey: 'circuitID'
+});
+Circuit.hasMany(Church, {
+    foreignKey: 'circuitID',
+    as: 'Churches',
+    onDelete: 'CASCADE'
+});
 
 var ChurchContact = sequelize.define('churchContact', {
     churchContact: {
@@ -72,7 +91,7 @@ var Visitor = sequelize.define('churchVisitor', {
 
 });
 
-var ChurchVisited = sequelize.define('churchVisited', {
+var ChurchVisited = sequelize.define('churchVisit', {
     guestOf: {
         type: Sequelize.STRING
     },
@@ -84,20 +103,43 @@ var ChurchVisited = sequelize.define('churchVisited', {
     }
 });
 
-ChurchContact.belongsTo(Church);
-ChurchMission.belongsTo(Church);
-ChurchVisited.belongsTo(Visitor);
-ChurchVisited.belongsTo(Church);
-
-Church.hasMany(ChurchContact, { foreignKey: 'churchID', as: 'contacts', onDelete: 'CASCADE' });
-Church.hasMany(ChurchMission, { foreignKey: 'churchID', as: 'missions', onDelete: 'CASCADE' });
-Church.hasMany(ChurchVisited, { foreignKey: 'churchID', as: 'churchVisited', onDelete: 'CASCADE' });
-Visitor.hasMany(ChurchVisited, { foreignKey: 'visitorID', as: 'visitorInfo', onDelete: 'CASCADE' });
+ChurchContact.belongsTo(Church, {
+    foreignKey: 'churchID'
+});
+ChurchMission.belongsTo(Church, {
+    foreignKey: 'churchID'
+});
+ChurchVisited.belongsTo(Visitor, {
+    foreignKey: 'visitorID'
+});
+ChurchVisited.belongsTo(Church, {
+    foreignKey: 'churchID'
+});
+Church.hasMany(ChurchContact, {
+    foreignKey: 'churchID',
+    as: { singular: 'ChurchContact', plural: 'ChurchContacts' },
+    onDelete: 'CASCADE'
+});
+Church.hasMany(ChurchMission, {
+    foreignKey: 'churchID',
+    as: { singular: 'ChurchMission', plural: 'ChurchMissions' },
+    onDelete: 'CASCADE'
+});
+Church.hasMany(ChurchVisited, {
+    foreignKey: 'churchID',
+    as: { singular: 'VisitTime', plural: 'VisitTimes' },
+    onDelete: 'CASCADE'
+});
+Visitor.hasMany(ChurchVisited, {
+    foreignKey: 'visitorID',
+    as: { singular: 'VisitInfo', plural: 'VisitInfos' },
+    onDelete: 'CASCADE'
+});
 
 
 module.exports = {
     circuit: Circuit,
-    church: CircuitChurch,
+    church: Church,
     churchContact: ChurchContact,
     churchMission: ChurchMission,
     visitor: Visitor,
