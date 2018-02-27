@@ -23,20 +23,21 @@ var get_all_circuits = function(req, res) {
         var filters = !req.query.filter ? [] : req.query.filter;
         var parish = [];
 
+        function paramFilter(element) {
+            var item = element.split("=");
+            if (item[0] == 'parish') {
+                parish.push({ assocParish: item[1] });
+            }
+        };
+
 
         // create operator for parish
         if (filters && filters.constructor === Array) {
             filters.forEach(element => {
-                var item = element.split("=");
-                if (item[0] == 'parish') {
-                    parish.push({ assocParish: item[1] });
-                }
+                paramFilter(element);
             });
         } else {
-            var item = filters.split("=");
-            if (item[0] == 'parish') {
-                parish.push({ assocParish: item[1] });
-            }
+            paramFilter(filters);
         }
 
 
