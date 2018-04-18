@@ -34,7 +34,7 @@ var paramFilter = function(element) {
 
             filter_lst.circuits.push({ "circuit": value });
         }
-
+        //  [Op.like]: '%' + req.query.q + '%'
     });
 
     return filter_lst;
@@ -44,77 +44,35 @@ var paramFilter = function(element) {
 //  * Generate syntax for search criteria
 //  * @param {*} element 
 //  */
-// var paramSearch = function(element) {
-//     var criteria_result = {};
-//     if (element.q.value != undefined) {
-//         var query = {
-//             [Op.like]: '%' + element.q.value + '%'
-//         };
-
-//         if (element.q.search != undefined) {
-//             var criteria = parser.param_attr_spliter(element.q.search);
-
-//             if (criteria != []) {
-//                 criteria = criteria.forEach(element => {
-//                     searchby = ['circuit']
-//                     if (searchby.indexOf(element) >= 0) {
-//                         criteria_result[element] = query;
-//                     }
-//                 });
-//             }
-//         }
-//     }
-
-//     return criteria_result;
-// };
-
-
-
-var paramParish = function(filters) {
-
-    var parish_lst = [];
-    var result = {};
-
-    filters.forEach(element => {
-        parish_lst.push({ "parish": element })
-    });
-
-    result = {
-        [Op.or]: parish_lst
-    };
-
-    return result;
-};
-
-var paramKeys = function(keys) {
-
-    var key_lst = [];
-    var result = {};
-
-    keys.forEach(element => {
-        var num = 0;
-        if (element != null) {
-            if (!isNaN(that)) {
-                //radix is 10 for base10 which we are accustomed to counting in
-                num = parseInt(element, 10);
-            }
-        }
-
-        if (num !== 0 && num !== null && num !== undefined) {
-            key_lst.push({ "id": num });
-        }
-    });
-
-
-    if (key_lst !== []) {
-        result = {
-            [Op.or]: key_lst
+var paramSearch = function(element) {
+    var criteria_result = {};
+    if (element.q.value != undefined) {
+        var query = {
+            [Op.like]: '%' + element.q.value + '%'
         };
+
+        // if (element.q.search != undefined) {
+        //     var criteria = parser.param_attr_spliter(element.q.search);
+
+        //     if (criteria !== []) {
+        //         criteria = criteria.forEach(element => {
+        searchby = ['circuit']
+            //             if (searchby.indexOf(element) >= 0) {
+        criteria_result[searchby] = query;
+        //             }
+        //         });
+        //     }
+        // }
     }
 
-
-    return result;
+    return criteria_result;
+    // };
 }
+
+
+
+
+
 
 
 
@@ -127,6 +85,10 @@ var paramKeys = function(keys) {
 var paramWhereQuery = function(element) {
 
     var where_query = {};
+
+    if (element.q !== {}) {
+        var search = paramSearch(element);
+    }
 
     if (element.filters !== undefined) {
 
