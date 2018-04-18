@@ -34,6 +34,13 @@ var parse_parameters = function(req) {
             page_cnt["page"] = 1;
             page_cnt["limit"] = parseInt(req.query.limit);
             params['page_content'] = page_cnt;
+        } else {
+            var page_cnt = {};
+
+            page_cnt["page"] = 1;
+            page_cnt["limit"] = 40;
+
+            params['page_content'] = page_cnt;
         }
 
         // if searching for keys all others are irrevalent so the params are returned.
@@ -46,15 +53,15 @@ var parse_parameters = function(req) {
 
             }
             if (req.query.q !== undefined && req.query.q !== null) {
-                var tmp_params = {};
+                params["q"] = {};
 
-                tmp_params["value"] = param_attr_spliter(req.query.q);
+                params.q["value"] = req.query.q;
                 if (req.query.search !== undefined && req.query.search !== null) {
-                    tmp_params["search"] = param_attr_spliter(req.query.search);
+                    params.q["search"] = param_attr_spliter(req.query.search);
                 }
-
-                params["q"] = [];
-                params.q[0] = tmp_params;
+                console.log('Par: ' + JSON.stringify(params.q));
+                // params["q"] = [];
+                // params.q[0] = tmp_params;
             }
         }
     } catch (err) {}
