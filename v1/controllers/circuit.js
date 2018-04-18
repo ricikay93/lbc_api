@@ -150,7 +150,10 @@ var get_a_circuit = function(req, res) {
 var add_circuit = function(req, res) {
 
     if (!req.body) { res.status(500).send('Internal Server Error'); } else {
-        var newCircuit = new Circuit(req.body);
+
+        var json = JSON.parse(JSON.stringify(req.body).split('"parish":').join('"assocParish":'));
+
+        var newCircuit = new Circuit(json);
 
         newCircuit.save().then((result) => {
             res.status(201).json({
