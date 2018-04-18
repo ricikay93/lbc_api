@@ -4,7 +4,7 @@ var referenceModels = require('../models/references');
 var churchCircuit = require('../models/circuitChurch');
 
 let sequelize = config.sequelize;
-let Church = churchCircuit.models.church;
+let Church = churchCircuit.church;
 
 var Member = sequelize.define('member', {
     title: {
@@ -83,7 +83,7 @@ MemberEmergencyContact.belongsTo(Member);
 Church.hasMany(Member, { foreignKey: 'churchID', as: 'members', onDelete: 'CASCADE' });
 Member.hasMany(MemberContact, { foreignKey: 'memberID', as: 'contacts', onDelete: 'CASCADE' });
 Member.hasMany(MemberSchooling, { foreignKey: 'memberID', as: 'schooling', onDelete: 'CASCADE' });
-Member.belongsTo(MemberEmergencyContact, { foreignKey: 'memberID', as: 'emergencyContacts', onDelete: 'CASCADE' });
+Member.hasMany(MemberEmergencyContact, { foreignKey: 'memberID', as: 'emergencyContacts', onDelete: 'CASCADE' });
 
 
 module.exports = {
