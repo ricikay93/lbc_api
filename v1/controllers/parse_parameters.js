@@ -5,11 +5,11 @@
  * @param {*} req 
  * @returns {string: object } params object
  */
-exports.parse_parameters = function(req) {
+var parse_parameters = function(req) {
 
     var params = {};
 
-    console.log('Attributes' + req.query.keys);
+    //   console.log('Attributes' + req.query.keys);
 
     try {
         if (req.query.attributes !== undefined && req.query.attributes !== null) {
@@ -17,15 +17,23 @@ exports.parse_parameters = function(req) {
         }
 
         if (req.query.page !== undefined && req.query.page !== null) {
-            params["page"] = parseInt(req.query.page);
+            var page_cnt = {};
+
+
+            page_cnt["page"] = parseInt(req.query.page);
             if (req.query.limit !== undefined && req.query.limit !== null) {
-                params["limit"] = parseInt(req.query.limit);
+                page_cnt["limit"] = parseInt(req.query.limit);
             } else {
-                params["limit"] = 40;
+                page_cnt["limit"] = 40;
             }
 
+            params['page_content'] = page_cnt;
         } else if (req.query.limit !== undefined && req.query.limit !== null) {
-            params["limit"] = parseInt(req.query.limit);
+            var page_cnt = {};
+
+            page_cnt["page"] = 1;
+            page_cnt["limit"] = parseInt(req.query.limit);
+            params['page_content'] = page_cnt;
         }
 
         // if searching for keys all others are irrevalent so the params are returned.
@@ -74,3 +82,8 @@ var param_attr_spliter = function(val) {
         return item.trim();
     });
 }
+
+module.exports = {
+    csvAtrrsplitter: param_attr_spliter,
+    parseParameters: parse_parameters
+};
