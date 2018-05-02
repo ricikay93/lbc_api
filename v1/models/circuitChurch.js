@@ -43,7 +43,12 @@ var Church = sequelize.define('church', {
     },
     churchTown: {
         type: Sequelize.STRING
-    }
+    },
+    // memberCount: {
+    //     type: Sequelize.VIRTUAL(Sequelize.INTEGER, [
+    //         [sequelize.literal('(SELECT COUNT(churches.id) FROM churches WHERE churches.circuitID = Circuit.id)'), 'churchCount']
+    //     ])
+    // }
 });
 
 Church.belongsTo(Circuit, {
