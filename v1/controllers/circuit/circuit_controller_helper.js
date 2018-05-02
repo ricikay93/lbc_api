@@ -26,14 +26,14 @@ var paramFilter = function(element) {
 
             filter_lst.parishes.push(value);
             // filter_lst.parishes.push({ assocParish: value });
-
-        } else if (item[0] == 'circuit') {
-            if (filter_lst.circuits === undefined || filter_lst.circuits === null) {
-                filter_lst['circuits'] = [];
-            }
-
-            filter_lst.circuits.push({ "circuit": value });
         }
+        // } else if (item[0] == 'circuit') {
+        //     if (filter_lst.circuits === undefined || filter_lst.circuits === null) {
+        //         filter_lst['circuits'] = [];
+        //     }
+
+        //     filter_lst.circuits.push({ "circuit": value });
+        // }
         //  [Op.like]: '%' + req.query.q + '%'
     });
 
@@ -86,40 +86,21 @@ var paramWhereQuery = function(element) {
 
     var where_query = {};
 
-    if (element.q !== {}) {
-        var search = paramSearch(element);
-    }
+    // if (element.q !== {}) {
+    //     var search = paramSearch(element);
+    // }
 
     if (element.filters !== undefined) {
 
 
         var filters = paramFilter(element.filters);
 
-        //     // //         // if (filters.quota != undefined) {
-        //     // //         //     where_query['seat_quota'] = paramSeatCount(filters.quota);
-        //     // //  
-
-
-
         if (filters.parishes !== undefined) {
-            //         console.log('Parishes' + JSON.stringify(filters.parishes));
 
             where_query['assocParish'] = {
                 [Op.or]: filters.parishes
             };
         }
-
-
-        //     if (filters.circuits != undefined) {
-        //         console.log('Circuits' + JSON.stringify(filters.circuits));
-        //     }
-
-
-
-        //         // if (filters.date != undefined) {
-        //         //     where_query['dateConst'] = paramDate(filters.date);
-        //         // }
-
 
     }
 
