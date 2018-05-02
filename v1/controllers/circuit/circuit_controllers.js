@@ -19,8 +19,6 @@ let parser = require('../parse_parameters');
 let helper = require('./circuit_controller_helper');
 
 exports.get_grouping = function(req, res) {
-    //     - grouping/?type=letter&parent=#
-    // -grouping/?type=letter&parent=A
     if (req.query.parent === '#') {
         getParents(req.query.type, res);
     } else {
@@ -32,7 +30,8 @@ exports.get_grouping = function(req, res) {
 function getParents(type, res) {
     var parent_group = ['parish'];
     if (type === 'letter') {
-        sequelize.query("SELECT distinct substr(circuit,1,1) as grouping FROM circuits", { type: sequelize.QueryTypes.SELECT })
+        //fix total to be 
+        sequelize.query("SELECT distinct substr(circuit,1,1) as grouping, count(substr(circuit,1,1)) as total FROM circuits group by circuit", { type: sequelize.QueryTypes.SELECT })
             .then(grouping => {
                 res.status(200).json({
                     'result': grouping
@@ -54,22 +53,38 @@ function getParents(type, res) {
 function getChildren(parent, type, res) {
     var parent_group = ['parish'];
     if (type === 'letter') {
-        // sequelize.query("SELECT distinct substr(circuit,1,1) as grouping FROM circuits", { type: sequelize.QueryTypes.SELECT })
-        //     .then(grouping => {
-        //         res.status(200).json({
-        //             'result': grouping
-        //         })
-        //     });
+        var search_param = parent + '%';
+        console.log(search_param);
+        Circuit.findAndCountAll({
+            where: {
+                circuit: {
+                    [Op.like]: search_param
+                }
+            },
+            attributes: ['id', 'circuit']
+        }).then(data => {
+            res.status(200).json({
+                'count': data.count,
+                'result': data.rows
+            });
+        });
     } else if (parent_group.indexOf(type) !== -1) {
         if (type === 'parish') {
             type = 'assocParish';
         }
-        // sequelize.query("select distinct(" + type + ") as grouping from circuits", { type: sequelize.QueryTypes.SELECT })
-        //     .then(grouping => {
-        //         res.status(200).json({
-        //             'result': grouping
-        //         })
-        //     });
+
+        var where_query = {};
+        where_query[type] = parent;
+
+        Circuit.findAndCountAll({
+            where: where_query,
+            attributes: ['id', 'circuit']
+        }).then(data => {
+            res.status(200).json({
+                'count': data.count,
+                'result': data.rows
+            });
+        });
     }
 }
 
