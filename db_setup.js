@@ -1,9 +1,9 @@
-// var db_config = require('./server/db');
+process.env.NODE_ENV = 'production';
 var config = require('./v1/config/config');
 
 // models
 var circuitAndChurch = require('./v1/models/circuitChurch');
-var member = require('./v1/models/member');
+// var member = require('./v1/models/member');
 var references = require('./v1/models/references');
 
 let sequelize = config.sequelize;

@@ -1,4 +1,5 @@
 // Get dependencies
+process.env.NODE_ENV = 'production';
 const express = require('express');
 const path = require('path');
 const http = require('http');
@@ -24,6 +25,11 @@ app.use(function(req, res, next) {
     res.header('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
     next();
 });
+
+//During the test the env variable is set to test
+
+
+// *** main routes ***
 app.use('/api/v1/', api);
 
 // Catch all other routes and return the index file
