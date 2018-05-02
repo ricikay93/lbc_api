@@ -9,7 +9,14 @@ router.route('/')
     .post(middleware.validateCircuit, controllers.add_circuit)
     .delete(controllers.delete_circuits);
 
-router.route('/:id([0-9]+')
+// for the tree
+router.route('/grouping')
+    .get(controllers.get_grouping)
+
+// router.route('/grouping/parent/:group')
+//     .get(controllers.get_group_children)
+
+router.route('/:id([0-9]+)')
     .get(controllers.get_a_circuit)
     .put(controllers.edit_circuit)
     .delete(controllers.delete_circuit);

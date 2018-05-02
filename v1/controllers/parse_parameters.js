@@ -16,6 +16,12 @@ var parse_parameters = function(req) {
             params["attributes"] = param_attr_spliter(req.query.attributes);
         }
 
+        if (req.query.result !== undefined && req.query.result !== null) {
+            params["result_type"] = req.query.result;
+        } else {
+            params["result_type"] = "data";
+        }
+
         if (req.query.page !== undefined && req.query.page !== null) {
             var page_cnt = {};
 
@@ -28,20 +34,26 @@ var parse_parameters = function(req) {
             }
 
             params['page_content'] = page_cnt;
-        } else if (req.query.limit !== undefined && req.query.limit !== null) {
-            var page_cnt = {};
+        } else if (req.query.result === 'data') {
+            if (req.query.limit !== undefined && req.query.limit !== null) {
+                var page_cnt = {};
 
-            page_cnt["page"] = 1;
-            page_cnt["limit"] = parseInt(req.query.limit);
-            params['page_content'] = page_cnt;
-        } else {
-            var page_cnt = {};
+                page_cnt["page"] = 1;
+                page_cnt["limit"] = parseInt(req.query.limit);
+                params['page_content'] = page_cnt;
+            } else {
+                var page_cnt = {};
 
-            page_cnt["page"] = 1;
-            page_cnt["limit"] = 40;
+                page_cnt["page"] = 1;
+                page_cnt["limit"] = 40;
 
-            params['page_content'] = page_cnt;
+                params['page_content'] = page_cnt;
+            }
         }
+
+
+
+
 
         // if searching for keys all others are irrevalent so the params are returned.
         if (req.query.keys !== undefined && req.query.keys !== null) {

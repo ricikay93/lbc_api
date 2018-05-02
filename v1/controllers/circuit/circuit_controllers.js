@@ -18,6 +18,63 @@ let Church = churchCircuit.church;
 let parser = require('../parse_parameters');
 let helper = require('./circuit_controller_helper');
 
+exports.get_grouping = function(req, res) {
+    //     - grouping/?type=letter&parent=#
+    // -grouping/?type=letter&parent=A
+    if (req.query.parent === '#') {
+        getParents(req.query.type, res);
+    } else {
+        getChildren(req.query.parent, req.query.type, res);
+    }
+
+};
+
+function getParents(type, res) {
+    var parent_group = ['parish'];
+    if (type === 'letter') {
+        sequelize.query("SELECT distinct substr(circuit,1,1) as grouping FROM circuits", { type: sequelize.QueryTypes.SELECT })
+            .then(grouping => {
+                res.status(200).json({
+                    'result': grouping
+                })
+            });
+    } else if (parent_group.indexOf(type) !== -1) {
+        if (type === 'parish') {
+            type = 'assocParish';
+        }
+        sequelize.query("select distinct(" + type + ") as grouping from circuits", { type: sequelize.QueryTypes.SELECT })
+            .then(grouping => {
+                res.status(200).json({
+                    'result': grouping
+                })
+            });
+    }
+}
+
+function getChildren(parent, type, res) {
+    var parent_group = ['parish'];
+    if (type === 'letter') {
+        // sequelize.query("SELECT distinct substr(circuit,1,1) as grouping FROM circuits", { type: sequelize.QueryTypes.SELECT })
+        //     .then(grouping => {
+        //         res.status(200).json({
+        //             'result': grouping
+        //         })
+        //     });
+    } else if (parent_group.indexOf(type) !== -1) {
+        if (type === 'parish') {
+            type = 'assocParish';
+        }
+        // sequelize.query("select distinct(" + type + ") as grouping from circuits", { type: sequelize.QueryTypes.SELECT })
+        //     .then(grouping => {
+        //         res.status(200).json({
+        //             'result': grouping
+        //         })
+        //     });
+    }
+}
+
+
+
 exports.get_all_circuits = function(req, res) {
     if (req.query !== null && req.query !== undefined && Object.keys(req.query).length !== 0) {
         var where_query = {};
@@ -30,7 +87,6 @@ exports.get_all_circuits = function(req, res) {
         } else {
             getAllCircuitsWithFilter(params, res);
         }
-        // res.json({ 'message': 'OK with params' });
     } else {
         getAllCircuitsNoFilter(res);
     }
@@ -52,31 +108,42 @@ function getAllCircuitsWithFilter(params, res) {
     Circuit.findAndCountAll(complete_query).then(function(data) {
         //   console.log('cont' + JSON.stringify(data.count));
 
-        let pages = Math.ceil(data.count / params.page_content.limit);
-        params.page_content['pages'] = pages;
+        // if the result type is a count then dont do the limit thing
 
-        params.page_content['count'] = data.count;
+        if (params.result_type === 'count') {
+            res.status(200).json({
+                'count': data.count,
+                'data': 'circuits'
+            })
+        } else if (params.result_type === 'data') {
+            let pages = Math.ceil(data.count / params.page_content.limit);
+            params.page_content['pages'] = pages;
 
-        if (data.count == 0) {
-            params.page_content['result'] = data.rows;
-            res.status(200).json(params.page_content);
+            params.page_content['count'] = data.count;
 
-        } else if (params.page_content.limit && params.page_content.page) {
-            complete_query['group'] = ['id'];
-            complete_query['limit'] = params.page_content.limit;
-            complete_query['offset'] = params.page_content.limit * (params.page_content.page - 1);
-
-            Circuit.findAll(complete_query).then(result => {
+            if (data.count == 0) {
                 params.page_content['result'] = data.rows;
                 res.status(200).json(params.page_content);
-            });
 
-        } else {
-            res.status(200).json({
-                'result': result.rows,
-                'count': params.page_content.count
-            });
+            } else if (params.page_content.limit && params.page_content.page) {
+                complete_query['group'] = ['id'];
+                complete_query['limit'] = params.page_content.limit;
+                complete_query['offset'] = params.page_content.limit * (params.page_content.page - 1);
+
+                Circuit.findAll(complete_query).then(result => {
+                    params.page_content['result'] = data.rows;
+                    res.status(200).json(params.page_content);
+                });
+
+            } else {
+                res.status(200).json({
+                    'result': result.rows,
+                    'count': params.page_content.count
+                });
+            }
+
         }
+
 
     });
 }
@@ -114,11 +181,7 @@ exports.get_a_circuit = function(req, res) {
                 attributes: ['code', 'parish']
             })
 
-
             complete_query['where']['id'] = req.params.id;
-
-
-            console.log(JSON.stringify(complete_query));
 
             Circuit.find(complete_query).then((result) => {
                 res.status(200).json({
